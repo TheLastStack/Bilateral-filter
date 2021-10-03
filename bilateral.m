@@ -16,7 +16,7 @@ for i = 1:k_end
 end
 
 in_var = in_sig ^ 2;
-final_img = zeros(height, width);
+final_img = db_img;
 g_inten = zeros(k_end, k_end);
 for i = 1 + KERNEL_SIZE:height - KERNEL_SIZE
     for j = 1 + KERNEL_SIZE: width - KERNEL_SIZE
