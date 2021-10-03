@@ -14,8 +14,6 @@ for i = 1:k_end
         g_sp(i, j) = exp(- ((i - KERNEL_SIZE - 1)^2 + (j - KERNEL_SIZE - 1)^2) / (2 * sp_var));
     end
 end
-sp_norm = sum(g_sp, 'all');
-g_sp = g_sp ./ sp_norm;
 
 in_var = in_sig ^ 2;
 final_img = zeros(height, width);
@@ -24,11 +22,13 @@ for i = 1 + KERNEL_SIZE:height - KERNEL_SIZE
     for j = 1 + KERNEL_SIZE: width - KERNEL_SIZE
         for m = -KERNEL_SIZE:KERNEL_SIZE
             for n = -KERNEL_SIZE:KERNEL_SIZE
-                g_inten(m + KERNEL_SIZE + 1, n + KERNEL_SIZE + 1) = exp(-(double(img(i, j) - img(i + m, j + n))).^2 / (2 * in_var));
+                g_inten(m + KERNEL_SIZE + 1, n + KERNEL_SIZE + 1) = exp(-(db_img(i, j) - db_img(i + m, j + n)).^2 ./ (2 * in_var));
             end
         end
-        in_norm = sum(g_inten(:));
-        g_inten = g_inten ./ in_norm;
-        final_img(i, j) = double(img(i - KERNEL_SIZE: i+KERNEL_SIZE, j - KERNEL_SIZE:j + KERNEL_SIZE)) .* g_sp .* g_inten;
+        g_all = g_sp .* g_inten;
+        all_norm = sum(g_all(:));
+        g_all = g_all ./ all_norm;
+        final_img(i, j) = sum(db_img(i - KERNEL_SIZE: i+KERNEL_SIZE, j - KERNEL_SIZE:j + KERNEL_SIZE) .* g_all, 'all');
     end
 end
+imshow(uint8(final_img));
